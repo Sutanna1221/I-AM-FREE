@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>I AM FREE</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        body {
+            background-color: #f7f9fb;
+            color: #222;
+            line-height: 1.7;
+            max-width: 820px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+        .header {
+            text-align: center;
+            margin:24px 0;
+        }
+        .header h1 {
+            font-size:28px;
+            color:#7B2CBF; /* 紫罗兰主色 */
+        }
+        .header-desc{
+            font-size:14px;
+            color:#666;
+            margin-top:6px;
+        }
+        .search-box {
+            width:100%;
+            padding:12px 16px;
+            border-radius:10px;
+            border:1px solid #d8dde6;
+            font-size:16px;
+            margin-bottom:16px;
+            background: #fff;
+            outline-color: #7B2CBF;
+        }
+        .tags-wrap {
+            display:flex;
+            gap:8px;
+            flex-wrap:wrap;
+            margin-bottom:20px;
+        }
+        .tag {
+            padding:6px 14px;
+            background:#f0e6fa; /* 浅紫罗兰底色 */
+            border-radius:20px;
+            font-size:14px;
+            cursor:pointer;
+            transition:0.2s;
+            color:#7B2CBF;
+        }
+        .tag.active {
+            background:#7B2CBF; /* 紫罗兰主色激活 */
+            color:#fff;
+        }
+        .doc-card {
+            background:#fff;
+            padding:18px;
+            border-radius:12px;
+            margin-bottom:12px;
+            border:1px solid #e9edf2;
+            cursor:pointer;
+            transition:0.2s;
+        }
+        .doc-card:hover{
+            box-shadow:0 2px 12px #7B2CBF22;
+            border-color: #9333EA;
+        }
+        .doc-card h3 {
+            margin-bottom:6px;
+            font-size:17px;
+            color:#1a2436;
+        }
+        .doc-card .brief {
+            font-size:14px;
+            color:#555;
+        }
+        .doc-card .time {
+            font-size:12px;
+            color:#888;
+            margin-top:8px;
+        }
+        .btn-group {
+            display:flex;
+            gap:10px;
+            margin:20px 0;
+            flex-wrap:wrap;
+        }
+        .mode-btn {
+            padding:10px 18px;
+            border-radius:8px;
+            border:1px solid #7B2CBF;
+            background:#fff;
+            color:#7B2CBF;
+            cursor:pointer;
+            transition:0.2s;
+        }
+        .mode-btn.active {
+            background:#7B2CBF; /* 紫罗兰主色按钮激活 */
+            color:#fff;
+        }
+        .content-area {
+            white-space:pre-wrap;
+            background:#fff;
+            padding:22px;
+            border-radius:12px;
+            font-size:16px;
+            line-height:1.8;
+            border-top:3px solid #1E40AF; /* 宝蓝色辅色点缀 */
+        }
+        .nav-back {
+            display:inline-block;
+            margin:12px 0;
+            color:#1E40AF; /* 宝蓝色辅色 */
+            cursor:pointer;
+        }
+        .page {
+            display:none;
+        }
+        .page.active {
+            display:block;
+        }
+        .about-text{
+            color:#333;
+            line-height:1.9;
+        }
+        .footer-note {
+            margin-top:40px;
+            font-size:13px;
+            color:#666;
+        }
+        a{
+            color:#1E40AF !important; /* 链接宝蓝色 */
+        }
+    </style>
+</head>
+<body>
+    <!--首页-->
+    <div id="page-home" class="page active">
+        <div class="header">
+            <h1>I AM FREE</h1>
+            <p class="header-desc">翻译文档公益学习库｜仅供个人研读学习</p>
+        </div>
+
+        <input class="search-box" id="searchInput" placeholder="搜索文档标题、简介关键词...">
+
+        <div class="tags-wrap" id="tagWrap"></div>
+
+        <div id="docList"></div>
+
+        <div style="text-align:center;margin-top:30px;">
+            <a style="font-size:14px;cursor:pointer;" onclick="showPage('page-about')">网站简介 & 免责声明</a>
+        </div>
+    </div>
+
+    <!--阅读页-->
+    <div id="page-read" class="page">
+        <div class="nav-back" onclick="goHome()">← 返回首页</div>
+        <h2 id="readTitle" style="margin-bottom:15px;font-size:22px;color:#7B2CBF;"></h2>
+        <div class="btn-group">
+            <button class="mode-btn active" data-mode="cn">纯中文</button>
+            <button class="mode-btn" data-mode="en">纯英文</button>
+            <button class="mode-btn" data-mode="both">中英文对照</button>
+        </div>
+        <div class="content-area" id="readContent"></div>
+    </div>
+
+    <!--网站简介页面-->
+    <div id="page-about" class="page">
+        <div class="nav-back" onclick="goHome()">← 返回首页</div>
+        <div class="header">
+            <h1>I AM FREE</h1>
+        </div>
+        <div class="content-area about-text">【网站简介】
+本平台为爱好者自发整理的翻译学习资料库，收录谕令、扬升大师开示、灵性基础知识等双语翻译文档。
+所有内容仅用于个人学习、研读、参考，营造纯净的学习交流环境。
+
+【免责声明】
+本站所有中文翻译内容仅供参考，供个人学习研读，禁止二次篡改、商用、营销使用。
+原文版权不归任何人类所有，这些知识是属于全人类的共同财富，它来自扬升大师的爱！请分享它！
+
+【使用说明】
+1. 可通过顶部搜索快速查找任意文档
+2. 可按板块分类筛选阅读
+3. 每篇文档支持：纯中文 / 纯英文 / 中英文对照 三种阅读模式
+        </div>
+    </div>
+
+<script>
+// ========== 在这里添加你的文档！！==========
+// 固定四大板块：网站简介 / 扬升大师 / 谕令 / 基础知识
+const documents = [
+  // 示例1：扬升大师板块
+  {
+    id: "master01",
+    title: "扬升大师示例文档",
+    category: "扬升大师",
+    brief: "扬升大师相关开示译文参考",
+    updateTime: "2026-08-27",
+    cn: "这里粘贴【扬升大师】纯中文内容",
+    en: "Paste Master Ascension Teaching English text here.",
+    both: "【英文】Paste Master Ascension Teaching English text here.\n【中文】这里粘贴【扬升大师】纯中文内容"
+  },
+  // 示例2：谕令板块
+  {
+    id: "yuling01",
+    title: "谕令示例文档",
+    category: "谕令",
+    brief: "谕令系列学习参考文档",
+    updateTime: "2026-08-27",
+    cn: "这里粘贴【谕令】纯中文内容",
+    en: "Paste your Decree English text here.",
+    both: "【英文】Paste your Decree English text here.\n【中文】这里粘贴【谕令】纯中文内容"
+  },
+  // 示例3：基础知识板块
+  {
+    id: "base01",
+    title: "基础知识示例文档",
+    category: "基础知识",
+    brief: "灵性基础认知学习资料",
+    updateTime: "2026-08-27",
+    cn: "这里粘贴【基础知识】纯中文内容",
+    en: "Paste basic knowledge English text here.",
+    both: "【英文】Paste basic knowledge English text here.\n【中文】这里粘贴【基础知识】纯中文内容"
+  }
+];
+
+// 全局状态
+let currentDocId = null;
+let currentMode = "cn";
+let activeCategory = null;
+
+// 渲染板块标签（固定指定顺序：网站简介、扬升大师、谕令、基础知识）
+function renderTags(){
+    const tagWrap = document.getElementById("tagWrap");
+    const cats = ["网站简介","扬升大师","谕令","基础知识"];
+    tagWrap.innerHTML = `<div class="tag ${activeCategory===null?'active':''}" data-cat="">全部</div>`;
+    cats.forEach(c=>{
+        const el = document.createElement('div');
+        el.className = `tag ${activeCategory===c?'active':''}`;
+        el.dataset.cat = c;
+        el.innerText = c;
+        tagWrap.appendChild(el);
+    })
+    // 绑定点击筛选
+    tagWrap.querySelectorAll('.tag').forEach(t=>{
+        t.onclick = ()=>{
+            activeCategory = t.dataset.cat||null;
+            renderTags();
+            renderList();
+        }
+    })
+}
+
+// 渲染文档列表 + 搜索
+function renderList(){
+    const kw = document.getElementById("searchInput").value.trim().toLowerCase();
+    let list = documents;
+    if(activeCategory){
+        list = list.filter(d=>d.category === activeCategory);
+    }
+    if(kw){
+        list = list.filter(d=>d.title.toLowerCase().includes(kw) || d.brief.toLowerCase().includes(kw))
+    }
+    const dom = document.getElementById("docList");
+    dom.innerHTML = "";
+    list.forEach(d=>{
+        const card = document.createElement('div');
+        card.className = "doc-card";
+        card.innerHTML = `
+            <h3>${d.title}</h3>
+            <div class="brief">${d.brief}</div>
+            <div class="time">${d.updateTime}</div>
+        `;
+        card.onclick = ()=>openDoc(d.id);
+        dom.appendChild(card);
+    })
+}
+
+// 打开文档
+function openDoc(id){
+    currentDocId = id;
+    const d = documents.find(x=>x.id===id);
+    if(!d) return;
+    document.getElementById("readTitle").innerText = d.title;
+    showPage('page-read');
+    setMode('cn');
+}
+
+// 切换阅读模式
+function setMode(mode){
+    currentMode = mode;
+    const d = documents.find(x=>x.id===currentDocId);
+    if(!d) return;
+    let text = "";
+    if(mode==="cn") text = d.cn;
+    else if(mode==="en") text = d.en;
+    else text = d.both;
+    document.getElementById("readContent").innerText = text;
+    document.querySelectorAll('.mode-btn').forEach(b=>{
+        b.classList.toggle('active', b.dataset.mode === mode);
+    })
+}
+
+// 页面切换
+function showPage(pageId){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
+}
+function goHome(){
+    currentDocId=null;
+    showPage('page-home');
+}
+
+// 绑定模式按钮
+document.querySelectorAll('.mode-btn').forEach(btn=>{
+    btn.onclick = ()=> setMode(btn.dataset.mode);
+})
+
+// 搜索监听
+document.getElementById("searchInput").oninput = renderList;
+
+// 初始化
+renderTags();
+renderList();
+</script>
+</body>
+</html>
