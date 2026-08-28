@@ -183,7 +183,6 @@
         }
         .mode-btn.active { background: var(--primary); color: #fff; }
         .content-area {
-            white-space: pre-wrap;
             background: var(--surface);
             padding: 22px;
             border-radius: 12px;
@@ -191,6 +190,35 @@
             line-height: 1.8;
             border-top: 3px solid var(--read-border);
             color: var(--text);
+        }
+        .content-area img {
+            max-width: 100%;
+            height: auto;
+            border-radius:8px;
+            margin:12px 0;
+        }
+        .content-area iframe{
+            max-width:100%;
+            border-radius:8px;
+            margin:12px 0;
+            border:none;
+        }
+        .content-area a{
+            text-decoration:underline;
+        }
+        .content-area blockquote {
+            border-left:4px solid var(--primary);
+            padding:10px 14px;
+            margin:12px 0;
+            background:var(--primary-soft);
+            border-radius:0 8px 8px 0;
+        }
+        .content-area ul,.content-area ol {
+            padding-left:1.6rem;
+            margin:12px 0;
+        }
+        .content-area h2,.content-area h3,.content-area h4 {
+            margin:14px 0 8px;
         }
         /* ===== 阅读页操作区 ===== */
         .read-actions { display: flex; gap: 12px; margin: 16px 0; flex-wrap: wrap; }
@@ -295,7 +323,6 @@
 </head>
 <body>
     <div id="progressBar"></div>
-
     <!--顶部导航-->
     <div class="top-nav">
         <span class="logo" onclick="navTo('page-home')">I AM FREE</span>
@@ -306,7 +333,6 @@
         </div>
         <button id="themeToggle">深色模式</button>
     </div>
-
     <!--首页-->
     <div id="page-home" class="page active">
         <div class="header">
@@ -320,7 +346,6 @@
             <a style="font-size:14px;cursor:pointer;" onclick="showPage('page-about')">网站简介 & 免责声明</a>
         </div>
     </div>
-
     <!--阅读页-->
     <div id="page-read" class="page">
         <div class="nav-back" onclick="goHome()">← 返回首页</div>
@@ -343,19 +368,16 @@
             </div>
         </div>
     </div>
-
     <!--我的收藏-->
     <div id="page-fav" class="page">
         <div class="section-title">我的收藏</div>
         <div id="favList"></div>
     </div>
-
     <!--我的笔记-->
     <div id="page-notes" class="page">
         <div class="section-title">我的笔记</div>
         <div id="notesList"></div>
     </div>
-
     <!--网站简介-->
     <div id="page-about" class="page">
         <div class="nav-back" onclick="goHome()">← 返回首页</div>
@@ -363,20 +385,17 @@
         <div class="content-area about-text">【网站简介】
 本平台为爱好者自发整理的翻译学习资料库，收录谕令、扬升大师开示、灵性基础知识等双语翻译文档。
 所有内容仅用于个人学习、研读、参考，营造纯净的学习交流环境。
-
 【免责声明】
 本站所有中文翻译内容仅供参考，供个人学习研读，禁止二次篡改、商用、营销使用。
 原文版权不归任何人类所有，这些知识是属于全人类的共同财富，它来自扬升大师的爱！请分享它！
-
 【使用说明】
 1. 可通过顶部搜索快速查找任意文档
 2. 可按板块分类筛选阅读
-3. 每篇文档支持：纯中文 / 纯英文 两种阅读模式
+3. 每篇文档支持：纯中文 / 纯英文 两种阅读模式，支持图片、链接、嵌入视频
 4. 支持深色模式、收藏、点赞与阅读进度记录
 5. 「我的笔记」可随时记录并自动保存学习心得
         </div>
     </div>
-
 <script>
 // ================== 本地存储工具 ==================
 const store = {
@@ -384,7 +403,6 @@ const store = {
     set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
 };
 const K_FAV='iamfree_fav', K_LIKE='iamfree_like', K_PROG='iamfree_prog', K_NOTE='iamfree_note', K_THEME='iamfree_theme';
-
 // ================== 在这里添加你的文档！！==================
 // 固定四大板块：网站简介 / 扬升大师 / 谕令 / 基础知识
 // 每个文档字段说明：
@@ -393,17 +411,15 @@ const K_FAV='iamfree_fav', K_LIKE='iamfree_like', K_PROG='iamfree_prog', K_NOTE=
 //   category  : 板块（必须是上面四类之一）
 //   brief     : 简介，会显示在卡片上
 //   updateTime: 更新时间，如 "2026-08-28"
-//   cn        : 纯中文内容
-//   en        : 纯英文内容
+//   cn        : 纯中文内容，支持HTML标签：<img> <a> <iframe> <p> <h3> <blockquote> <ul>
+//   en        : 纯英文内容，支持HTML标签
 const documents = [
-  // 在这里添加你的文档
+  // 在这里填写你的文档
 ];
-
 // ================== 全局状态 ==================
 let currentDocId = null;
 let currentMode = "cn";
 let activeCategory = null;
-
 // ================== 主题（深色/浅色） ==================
 function applyTheme(t){
     document.documentElement.setAttribute('data-theme', t);
@@ -415,7 +431,6 @@ document.getElementById('themeToggle').onclick = ()=>{
     const cur = document.documentElement.getAttribute('data-theme');
     applyTheme(cur==='dark' ? 'light' : 'dark');
 };
-
 // ================== 收藏 / 点赞 / 进度 / 笔记 ==================
 function getFavs(){ return store.get(K_FAV, []); }
 function isFav(id){ return getFavs().includes(id); }
@@ -441,15 +456,13 @@ function getNotes(){ return store.get(K_NOTE, {}); }
 function getNote(id){ return getNotes()[id] || ''; }
 function saveNote(id, t){ const o = getNotes(); o[id] = t; store.set(K_NOTE, o); }
 function escapeHtml(s){
-    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace( />/g,'&gt;').replace(/"/g,'&quot;');
 }
-
 // ================== 文档文本 ==================
 function getDocText(d, mode){
     if(mode==='en') return d.en || '';
     return d.cn || '';
 }
-
 // ================== 卡片渲染 ==================
 function makeCard(d){
     const fav = isFav(d.id), liked = isLiked(d.id), p = getProg(d.id);
@@ -477,7 +490,6 @@ function makeCard(d){
     card.onclick = ()=>openDoc(d.id);
     return card;
 }
-
 // 渲染板块标签（固定顺序：网站简介、扬升大师、谕令、基础知识）
 function renderTags(){
     const tagWrap = document.getElementById("tagWrap");
@@ -498,7 +510,6 @@ function renderTags(){
         };
     });
 }
-
 // 渲染首页文档列表 + 搜索
 function renderList(){
     const kw = document.getElementById("searchInput").value.trim().toLowerCase();
@@ -510,7 +521,6 @@ function renderList(){
     if(!list.length){ dom.innerHTML = '<div class="empty-tip">没有找到匹配的文档</div>'; return; }
     list.forEach(d=>dom.appendChild(makeCard(d)));
 }
-
 // 渲染「我的收藏」
 function renderFav(){
     const dom = document.getElementById("favList");
@@ -522,7 +532,6 @@ function renderFav(){
     }
     favs.forEach(d=>dom.appendChild(makeCard(d)));
 }
-
 // 渲染「我的笔记」
 function renderNotes(){
     const dom = document.getElementById("notesList");
@@ -545,7 +554,6 @@ function renderNotes(){
         dom.appendChild(item);
     });
 }
-
 // ================== 打开文档 ==================
 function openDoc(id){
     currentDocId = id;
@@ -569,18 +577,16 @@ function openDoc(id){
         document.getElementById("progressBar").style.width = p + '%';
     }, 30);
 }
-
 // 切换阅读模式
 function setMode(mode){
     currentMode = mode;
     const d = documents.find(x=>x.id===currentDocId);
     if(!d) return;
-    document.getElementById("readContent").innerText = getDocText(d, mode);
+    document.getElementById("readContent").innerHTML = getDocText(d, mode);
     document.querySelectorAll('.mode-btn').forEach(b=>{
         b.classList.toggle('active', b.dataset.mode === mode);
     });
 }
-
 // 更新阅读页按钮状态
 function updateReadActions(){
     const d = documents.find(x=>x.id===currentDocId);
@@ -592,7 +598,6 @@ function updateReadActions(){
     likeBtn.classList.toggle('on', isLiked(d.id));
     likeBtn.innerHTML = isLiked(d.id) ? '♥ 已点赞' : '♡ 点赞';
 }
-
 // ================== 页面切换 ==================
 function showPage(pageId){
     document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -611,7 +616,6 @@ function showPage(pageId){
 }
 function navTo(pageId){ currentDocId = null; showPage(pageId); }
 function goHome(){ currentDocId = null; showPage('page-home'); }
-
 // 刷新当前可见区域
 function refreshAll(){
     const cur = document.querySelector('.page.active').id;
@@ -620,7 +624,6 @@ function refreshAll(){
     if(cur==='page-notes') renderNotes();
     if(cur==='page-read') updateReadActions();
 }
-
 // ================== 事件绑定 ==================
 document.querySelectorAll('.nav-tabs .tab').forEach(t=>{
     t.onclick = ()=>navTo(t.dataset.tab);
@@ -629,7 +632,6 @@ document.querySelectorAll('.mode-btn').forEach(btn=>{
     btn.onclick = ()=>setMode(btn.dataset.mode);
 });
 document.getElementById("searchInput").oninput = renderList;
-
 document.getElementById("favBtn").onclick = ()=>{
     if(!currentDocId) return;
     toggleFav(currentDocId);
@@ -661,7 +663,6 @@ document.getElementById("noteInput").oninput = ()=>{
         setTimeout(()=>{ s.innerText = ""; }, 1200);
     }, 800);
 };
-
 // ================== 阅读进度跟踪 ==================
 window.addEventListener('scroll', ()=>{
     if(!currentDocId) return;
@@ -676,7 +677,6 @@ window.addEventListener('scroll', ()=>{
         }, 600);
     }
 });
-
 // ================== 初始化 ==================
 renderTags();
 renderList();
