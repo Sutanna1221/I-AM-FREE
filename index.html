@@ -191,34 +191,93 @@
             border-top: 3px solid var(--read-border);
             color: var(--text);
         }
+        /* ===== 阅读页排版优化（全局统一，一次生效） ===== */
+        /* 正文段落：首行缩进2字符、统一行高间距 */
+        .content-area p {
+            text-indent: 2em;
+            margin: 14px 0;
+            line-height: 1.9;
+            color: var(--text);
+        }
+        /* 列表内段落取消首行缩进，避免排版错位 */
+        .content-area li p {
+            text-indent: 0;
+            margin: 8px 0;
+        }
+        /* 标题层级统一 */
+        .content-area h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 30px 0 18px;
+            line-height: 1.4;
+            border-bottom: 2px solid var(--primary-soft);
+            padding-bottom: 8px;
+        }
+        .content-area h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 24px 0 12px;
+            line-height: 1.5;
+        }
+        .content-area h3 {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text);
+            margin: 20px 0 10px;
+            line-height: 1.5;
+            border-left: 3px solid var(--primary);
+            padding-left: 10px;
+        }
+        /* 列表样式优化 */
+        .content-area ul, .content-area ol {
+            margin: 14px 0;
+            padding-left: 2em;
+            line-height: 1.9;
+            color: var(--text);
+        }
+        .content-area li {
+            margin: 6px 0;
+        }
+        /* 引用块样式增强 */
+        .content-area blockquote {
+            border-left: 4px solid var(--primary);
+            padding: 12px 18px;
+            margin: 18px 0;
+            background: var(--primary-soft);
+            border-radius: 0 8px 8px 0;
+            color: var(--text-sub);
+            line-height: 1.9;
+        }
+        .content-area blockquote p {
+            text-indent: 0;
+            margin: 8px 0;
+        }
+        /* 图片优化：自动居中、圆角、柔和阴影 */
         .content-area img {
+            display: block;
             max-width: 100%;
             height: auto;
-            border-radius:8px;
-            margin:12px 0;
+            border-radius: 8px;
+            margin: 18px auto;
+            box-shadow: 0 2px 12px var(--shadow);
+        }
+        /* 链接样式统一 */
+        .content-area a {
+            color: var(--accent);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--accent);
+            transition: .2s;
+        }
+        .content-area a:hover {
+            border-bottom-style: solid;
         }
         .content-area iframe{
             max-width:100%;
             border-radius:8px;
             margin:12px 0;
             border:none;
-        }
-        .content-area a{
-            text-decoration:underline;
-        }
-        .content-area blockquote {
-            border-left:4px solid var(--primary);
-            padding:10px 14px;
-            margin:12px 0;
-            background:var(--primary-soft);
-            border-radius:0 8px 8px 0;
-        }
-        .content-area ul,.content-area ol {
-            padding-left:1.6rem;
-            margin:12px 0;
-        }
-        .content-area h2,.content-area h3,.content-area h4 {
-            margin:14px 0 8px;
         }
         /* ===== 阅读页操作区 ===== */
         .read-actions { display: flex; gap: 12px; margin: 16px 0; flex-wrap: wrap; }
@@ -351,8 +410,8 @@
         <div class="nav-back" onclick="goHome()">← 返回首页</div>
         <h2 id="readTitle" style="margin-bottom:15px;font-size:22px;color:var(--primary);"></h2>
         <div class="btn-group">
-            <button class="mode-btn active" data-mode="cn">中文</button>
-            <button class="mode-btn" data-mode="en">英文</button>
+            <button class="mode-btn active" data-mode="cn">纯中文</button>
+            <button class="mode-btn" data-mode="en">纯英文</button>
         </div>
         <div class="content-area" id="readContent"></div>
         <div class="read-actions">
@@ -387,11 +446,11 @@
 所有内容仅用于个人学习、研读、参考，营造纯净的学习交流环境。
 【免责声明】
 本站所有中文翻译内容仅供参考，供个人学习研读，禁止二次篡改、商用、营销使用。
-
+原文版权不归任何人类所有，这些知识是属于全人类的共同财富，它来自扬升大师的爱！请分享它！
 【使用说明】
 1. 可通过顶部搜索快速查找任意文档
 2. 可按板块分类筛选阅读
-3. 每篇文档支持：中文 / 英文 两种阅读模式
+3. 每篇文档支持：纯中文 / 纯英文 两种阅读模式
 4. 支持深色模式、收藏、点赞与阅读进度记录
 5. 「我的笔记」可随时记录并自动保存学习心得
         </div>
@@ -411,9 +470,9 @@ async function loadDocuments(){
         // 1. 加载文档清单
         const res = await fetch('data/manifest.json');
         const manifest = await res.json();
-        
+
         // 2. 并行加载所有单篇文档
-        const tasks = manifest.map(item => 
+        const tasks = manifest.map(item =>
             fetch(`data/articles/${item.file}`)
                 .then(r => r.json())
                 .catch(err => {
@@ -422,16 +481,16 @@ async function loadDocuments(){
                 })
         );
         const results = await Promise.all(tasks);
-        
+
         // 3. 过滤掉加载失败的，存入全局 documents
         documents = results.filter(d => d !== null);
-        
+
         // 4. 全部加载完成后，初始化页面
         renderTags();
         renderList();
     }catch(e){
         console.error('文档加载失败:', e);
-        document.getElementById('docList').innerHTML = 
+        document.getElementById('docList').innerHTML =
             '<div class="empty-tip">文档加载失败，请检查网络或文件路径</div>';
     }
 }
@@ -475,7 +534,7 @@ function getNotes(){ return store.get(K_NOTE, {}); }
 function getNote(id){ return getNotes()[id] || ''; }
 function saveNote(id, t){ const o = getNotes(); o[id] = t; store.set(K_NOTE, o); }
 function escapeHtml(s){
-    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace( />/g,'&gt;').replace(/"/g,'&quot;');
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 // ================== 文档文本 ==================
 function getDocText(d, mode){
